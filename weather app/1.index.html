@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>weather app</title>
+    <link rel="stylesheet" href="2.style.css">
+</head>
+<body>
+    <div class="card">
+        <div class="search">
+            <input type="text" placeholder="enter the city name" spellcheck="false">
+            <button><img src="weather_app/images/search.png"></button>
+        </div>
+        <div class="error">
+            <p>Invalid city name</p>
+        </div>
+        <div class="weather">
+            <img src="weather_app/images/rain.png" class="weather-icon">
+            <h1 class="temp">22°c</h1>
+            <h2 class="city">New York</h2>
+            <div class="details">
+                <div class="col">
+                    <img src="weather_app/images/humidity.png">
+                    <div>
+                        <p class="humidity">50%</p>
+                        <p>Humidity</p>
+                    </div>
+                </div>
+                 <div class="col">
+                    <img src="weather_app/images/wind.png">
+                    <div>
+                        <p class="wind">15 km/h</p>
+                        <p>Wind Speed</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    const apiKey = "940a2978fd7349d8bdc140331251408";
+    const apiUrl = "https://api.weatherapi.com/v1/current.json?&q=";
+
+    const searchBox = document.querySelector(".search input");
+    const searchBtn = document.querySelector(".search button");
+    const weatherIcon = document.querySelector(".weather-icon");
+    const app = document.querySelector(".card");
+    const imgs = document.querySelector(".col img");
+
+    async function checkWeather(city){
+        const response = await fetch(apiUrl + city + `&key=${apiKey}`);
+
+        if(response.status == 400){
+            document.querySelector(".error").style.display = "block";
+            document.querySelector(".weather").style.display = "none";
+        }
+
+        else{
+        var data = await response.json();
+        console.log(data)
+        document.querySelector(".city").innerHTML = data.location.name;
+        document.querySelector(".temp").innerHTML = Math.round(data.current.temp_c) + "°c";
+        document.querySelector(".humidity").innerHTML = data.current.humidity + "%";
+        document.querySelector(".wind").innerHTML = data.current.wind_kph + " km/h";
+        
+    function setWeatherStyle(bg, textColor, icon, sat, outerBg) {
+    weatherIcon.src = icon;
+    app.style.background = bg;
+    document.body.style.background = outerBg || bg;
+    document.body.style.backgroundRepeat = "no-repeat";
+    document.body.style.backgroundAttachment = "fixed";
+    const imgs = document.querySelectorAll(".col img");
+    imgs.forEach(i => {
+        i.style.filter = sat;
+    });
+    // Apply text color to all children inside app
+    app.style.color = textColor;
+    app.querySelectorAll("*:not(input):not(textarea)").forEach(el => {
+        el.style.color = textColor;
+    });
+}
+
+if (data.current.condition.text.toLowerCase().includes("cloud") || data.current.condition.text.toLowerCase().includes("overcast")) { 
+    setWeatherStyle("linear-gradient(to bottom, #bdc3c7, #2c3e50)", "#fff", "weather_app/images/clouds.png", "brightness(0) invert(1)", "linear-gradient(to bottom, #141E30, #243B55)"  );
+}
+
+else if (data.current.condition.text.toLowerCase().includes("snow") || data.current.condition.text.toLowerCase().includes("sleet") || data.current.condition.text.toLowerCase().includes("blizzard") || data.current.condition.text.toLowerCase().includes("ice pellets")) { 
+    setWeatherStyle("linear-gradient(to bottom, #e6dada, #274046)", "#000", "weather_app/images/snow.png", "brightness(0) invert(0)", "linear-gradient(to bottom, #83a4d4, #b6fbff)");
+}
+
+else if (data.current.condition.text.toLowerCase().includes("drizzle")) { 
+    setWeatherStyle("linear-gradient(to bottom, #83a4d4, #b6fbff)", "#222", "weather_app/images/drizzle.png", "brightness(0) invert(14%) sepia(0%) saturate(0%) hue-rotate(21deg) brightness(13%) contrast(90%)",  "linear-gradient(to bottom, #373B44, #4286f4)");
+}
+
+else if (data.current.condition.text.toLowerCase().includes("rain") || data.current.condition.text.toLowerCase().includes("shower") || data.current.condition.text.toLowerCase().includes("freezing rain") || data.current.condition.text.toLowerCase().includes("thunderstorm")) { 
+    setWeatherStyle("linear-gradient(to bottom, #2c3e50, #3498db)", "#fff", "weather_app/images/rain.png", "brightness(0) invert(1)", "linear-gradient(to bottom, #000428, #004e92)");
+}
+
+else if (data.current.condition.text.toLowerCase().includes("clear") || data.current.condition.text.toLowerCase().includes("sunny")) { 
+    setWeatherStyle("linear-gradient(to bottom, #f9d423, #ff4e50)", "#222", "weather_app/images/clear.png", "brightness(0) invert(14%) sepia(0%) saturate(0%) hue-rotate(21deg) brightness(13%) contrast(90%)", "linear-gradient(to bottom, #56ccf2, #2f80ed)");
+}
+
+else if (data.current.condition.text.toLowerCase().includes("mist") || data.current.condition.text.toLowerCase().includes("fog")) { 
+    setWeatherStyle("linear-gradient(to bottom, #606c88, #3f4c6b)", "#fff", "weather_app/images/mist.png", "brightness(0) invert(1)", "linear-gradient(to bottom, #3E5151, #DECBA4)");
+}
+
+
+        document.querySelector(".weather").style.display = "block";
+        document.querySelector(".error").style.display = "none";
+    }
+}
+    searchBtn.addEventListener("click", ()=>{
+        checkWeather(searchBox.value);
+    })
+    
+</script>
+
+</body>
+</html>
